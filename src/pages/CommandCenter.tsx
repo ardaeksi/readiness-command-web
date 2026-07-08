@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { BaseMap } from "../components/map/BaseMap";
-import { UnitMarker } from "../components/map/UnitMarker";
-import { TransferMarker } from "../components/map/TransferMarker";
+import { GlobeView, type TransferArc } from "../components/globe/GlobeView";
 import { ReadinessSummary } from "../components/dashboard/ReadinessSummary";
 import { PendingRequestsPanel } from "../components/dashboard/PendingRequestsPanel";
 import { fetchUnits } from "../api/units";
@@ -9,19 +7,12 @@ import { fetchServiceMembers } from "../api/serviceMembers";
 import { approveAssignmentRequest, denyAssignmentRequest, fetchAssignmentRequests } from "../api/assignmentRequests";
 import type { AssignmentRequest, ServiceMember, Unit } from "../types/domain";
 
-interface ActiveTransfer {
-  from: [number, number];
-  to: [number, number];
-}
-
-const DEFAULT_CENTER: [number, number] = [35.1391, -79.006];
-
 export function CommandCenter() {
   const [units, setUnits] = useState<Unit[]>([]);
   const [members, setMembers] = useState<ServiceMember[]>([]);
   const [requests, setRequests] = useState<AssignmentRequest[]>([]);
   const [busyRequestId, setBusyRequestId] = useState<number | null>(null);
-  const [activeTransfer, setActiveTransfer] = useState<ActiveTransfer | null>(null);
+  const [activeTransfer, setActiveTransfer] = useState<TransferArc | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
@@ -57,9 +48,12 @@ export function CommandCenter() {
       await approveAssignmentRequest(request.id);
       if (fromUnit && toUnit) {
         setActiveTransfer({
-          from: [fromUnit.latitude, fromUnit.longitude],
-          to: [toUnit.latitude, toUnit.longitude],
+          startLat: fromUnit.latitude,
+          startLng: fromUnit.longitude,
+          endLat: toUnit.latitude,
+          endLng: toUnit.longitude,
         });
+        window.setTimeout(() => setActiveTransfer(null), 2000);
       }
       await loadData();
     } catch {
@@ -81,10 +75,6 @@ export function CommandCenter() {
     }
   };
 
-  const membersByUnit = (unitId: number) => members.filter((member) => member.unitId === unitId);
-
-  const mapCenter: [number, number] = units.length > 0 ? [units[0].latitude, units[0].longitude] : DEFAULT_CENTER;
-
   return (
     <div className="command-center">
       <header className="command-header">
@@ -96,18 +86,7 @@ export function CommandCenter() {
 
       <div className="command-body">
         <div className="map-panel">
-          <BaseMap center={mapCenter}>
-            {units.map((unit) => (
-              <UnitMarker key={unit.id} unit={unit} members={membersByUnit(unit.id)} />
-            ))}
-            {activeTransfer && (
-              <TransferMarker
-                from={activeTransfer.from}
-                to={activeTransfer.to}
-                onComplete={() => setActiveTransfer(null)}
-              />
-            )}
-          </BaseMap>
+          <GlobeView units={units} members={members} activeTransfer={activeTransfer} />
         </div>
 
         <aside className="dashboard-panel">
