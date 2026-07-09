@@ -3,15 +3,17 @@ import { AnimatePresence } from "framer-motion";
 import { GlobeView, type TransferArc } from "../components/globe/GlobeView";
 import { ReadinessSummary } from "../components/dashboard/ReadinessSummary";
 import { PendingRequestsPanel } from "../components/dashboard/PendingRequestsPanel";
-import { BaseDetailModal } from "../components/dashboard/BaseDetailModal";
+import { BaseDetailPanel } from "../components/dashboard/BaseDetailPanel";
 import { fetchUnits } from "../api/units";
 import { fetchServiceMembers } from "../api/serviceMembers";
+import { fetchEquipment } from "../api/equipment";
 import { approveAssignmentRequest, denyAssignmentRequest, fetchAssignmentRequests } from "../api/assignmentRequests";
-import type { AssignmentRequest, ServiceMember, Unit } from "../types/domain";
+import type { AssignmentRequest, Equipment, ServiceMember, Unit } from "../types/domain";
 
 export function CommandCenter() {
   const [units, setUnits] = useState<Unit[]>([]);
   const [members, setMembers] = useState<ServiceMember[]>([]);
+  const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [requests, setRequests] = useState<AssignmentRequest[]>([]);
   const [busyRequestId, setBusyRequestId] = useState<number | null>(null);
   const [activeTransfer, setActiveTransfer] = useState<TransferArc | null>(null);
@@ -20,13 +22,15 @@ export function CommandCenter() {
 
   const loadData = useCallback(async () => {
     try {
-      const [unitsData, membersData, requestsData] = await Promise.all([
+      const [unitsData, membersData, equipmentData, requestsData] = await Promise.all([
         fetchUnits(),
         fetchServiceMembers(),
+        fetchEquipment(),
         fetchAssignmentRequests("PENDING"),
       ]);
       setUnits(unitsData);
       setMembers(membersData);
+      setEquipment(equipmentData);
       setRequests(requestsData);
       setStatusMessage(null);
     } catch {
@@ -78,6 +82,8 @@ export function CommandCenter() {
     }
   };
 
+  const selectedUnit = units.find((unit) => unit.id === selectedUnitId) ?? null;
+
   return (
     <div className="command-center">
       <header className="command-header">
@@ -95,6 +101,17 @@ export function CommandCenter() {
             activeTransfer={activeTransfer}
             onSelectUnit={setSelectedUnitId}
           />
+
+          <AnimatePresence>
+            {selectedUnit && (
+              <BaseDetailPanel
+                unit={selectedUnit}
+                members={members.filter((member) => member.unitId === selectedUnit.id)}
+                equipment={equipment.filter((item) => item.unitId === selectedUnit.id)}
+                onClose={() => setSelectedUnitId(null)}
+              />
+            )}
+          </AnimatePresence>
         </div>
 
         <aside className="dashboard-panel">
@@ -107,21 +124,6 @@ export function CommandCenter() {
           />
         </aside>
       </div>
-
-      <AnimatePresence>
-        {selectedUnitId !== null &&
-          (() => {
-            const selectedUnit = units.find((unit) => unit.id === selectedUnitId);
-            if (!selectedUnit) return null;
-            return (
-              <BaseDetailModal
-                unit={selectedUnit}
-                members={members.filter((member) => member.unitId === selectedUnitId)}
-                onClose={() => setSelectedUnitId(null)}
-              />
-            );
-          })()}
-      </AnimatePresence>
     </div>
   );
 }

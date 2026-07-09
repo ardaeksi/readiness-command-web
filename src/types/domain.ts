@@ -8,6 +8,10 @@ export type CertificationStatus = "ACTIVE" | "EXPIRED" | "REVOKED";
 
 export type RequestStatus = "PENDING" | "APPROVED" | "DENIED" | "COMPLETED";
 
+export type EquipmentType = "GUN" | "TANK" | "CAR" | "CIVILIAN_CAR" | "TRUCK" | "HELICOPTER";
+
+export type EquipmentStatus = "OPERATIONAL" | "MAINTENANCE" | "OUT_OF_SERVICE";
+
 export interface Unit {
   id: number;
   name: string;
@@ -44,6 +48,16 @@ export interface ServiceMemberCertification {
   earnedDate: string;
   expiryDate: string;
   status: CertificationStatus;
+}
+
+export interface Equipment {
+  id: number;
+  name: string;
+  type: EquipmentType;
+  quantity: number;
+  status: EquipmentStatus;
+  unitId: number | null;
+  unitName: string | null;
 }
 
 export interface AssignmentRequest {

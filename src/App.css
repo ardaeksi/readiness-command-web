@@ -182,59 +182,54 @@
   white-space: nowrap;
 }
 
-/* Base detail modal */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(2, 4, 8, 0.65);
-  backdrop-filter: blur(2px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-
-.base-modal {
-  width: 440px;
-  max-width: calc(100vw - 40px);
-  max-height: calc(100vh - 80px);
+/* Base detail panel: a floating card anchored to the right edge of the map-panel.
+   Deliberately has no backdrop and a bounded width/height, so the globe underneath
+   and beside it stays fully draggable/zoomable while the panel is open. */
+.base-panel {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  bottom: 16px;
+  width: 320px;
+  max-width: calc(100% - 32px);
   overflow-y: auto;
   background: var(--panel);
   border: 1px solid var(--panel-border);
   border-radius: 10px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  z-index: 10;
 }
 
-.base-modal-banner {
+.base-panel-banner {
   position: relative;
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 20px;
+  padding: 18px;
   border-radius: 10px 10px 0 0;
 }
 
-.base-modal-branch-badge {
+.base-panel-branch-badge {
   flex-shrink: 0;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: #fff;
   border: 2px solid rgba(255, 255, 255, 0.5);
 }
 
-.base-modal-banner h2 {
-  font-size: 18px;
+.base-panel-banner h2 {
+  font-size: 16px;
   color: #fff;
 }
 
-.base-modal-banner p {
-  font-size: 12px;
+.base-panel-banner p {
+  font-size: 11px;
   color: rgba(255, 255, 255, 0.8);
   margin-top: 2px;
 }
@@ -253,55 +248,61 @@
   line-height: 1;
 }
 
-.base-modal-body {
-  padding: 20px;
+.base-panel-body {
+  padding: 16px;
 }
 
-.base-modal-stats {
+.base-panel-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 8px;
+  margin-bottom: 18px;
 }
 
-.base-modal-stat {
+.base-panel-stat {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  padding: 10px 6px;
+  padding: 8px 4px;
   border: 1px solid var(--panel-border);
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.02);
 }
 
-.base-modal-stat-count {
-  font-size: 18px;
+.base-panel-stat-count {
+  font-size: 16px;
   font-weight: 700;
   color: var(--text-heading);
 }
 
-.base-modal-stat-label {
-  font-size: 10px;
+.base-panel-stat-label {
+  font-size: 9px;
   color: var(--text-muted);
   text-align: center;
 }
 
-.base-modal-body h3 {
-  font-size: 13px;
+.base-panel-body h3 {
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-muted);
-  margin-bottom: 10px;
+  margin: 16px 0 10px;
 }
 
-.roster-list {
+.base-panel-body h3:first-of-type {
+  margin-top: 0;
+}
+
+.roster-list,
+.equipment-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.roster-row {
+.roster-row,
+.equipment-row {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -310,31 +311,64 @@
   border-radius: 6px;
 }
 
-.roster-avatar {
+.roster-avatar,
+.equipment-badge {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   color: #06231f;
 }
 
-.roster-info {
-  display: flex;
-  flex-direction: column;
+.equipment-badge {
+  color: #fff;
+  border-radius: 6px;
 }
 
-.roster-name {
+.roster-info,
+.equipment-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.roster-name,
+.equipment-name {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-heading);
 }
 
-.roster-status {
+.roster-status,
+.equipment-type {
   font-size: 11px;
   color: var(--text-muted);
+}
+
+.equipment-meta {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.equipment-qty {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-heading);
+}
+
+.equipment-status-pill {
+  font-size: 9px;
+  padding: 1px 6px;
+  border: 1px solid;
+  border-radius: 10px;
+  white-space: nowrap;
 }
