@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import { GlobeView, type TransferArc } from "../components/globe/GlobeView";
 import { ReadinessSummary } from "../components/dashboard/ReadinessSummary";
 import { PendingRequestsPanel } from "../components/dashboard/PendingRequestsPanel";
+import { BaseDetailModal } from "../components/dashboard/BaseDetailModal";
 import { fetchUnits } from "../api/units";
 import { fetchServiceMembers } from "../api/serviceMembers";
 import { approveAssignmentRequest, denyAssignmentRequest, fetchAssignmentRequests } from "../api/assignmentRequests";
@@ -14,6 +16,7 @@ export function CommandCenter() {
   const [busyRequestId, setBusyRequestId] = useState<number | null>(null);
   const [activeTransfer, setActiveTransfer] = useState<TransferArc | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [selectedUnitId, setSelectedUnitId] = useState<number | null>(null);
 
   const loadData = useCallback(async () => {
     try {
@@ -86,7 +89,12 @@ export function CommandCenter() {
 
       <div className="command-body">
         <div className="map-panel">
-          <GlobeView units={units} members={members} activeTransfer={activeTransfer} />
+          <GlobeView
+            units={units}
+            members={members}
+            activeTransfer={activeTransfer}
+            onSelectUnit={setSelectedUnitId}
+          />
         </div>
 
         <aside className="dashboard-panel">
@@ -99,6 +107,21 @@ export function CommandCenter() {
           />
         </aside>
       </div>
+
+      <AnimatePresence>
+        {selectedUnitId !== null &&
+          (() => {
+            const selectedUnit = units.find((unit) => unit.id === selectedUnitId);
+            if (!selectedUnit) return null;
+            return (
+              <BaseDetailModal
+                unit={selectedUnit}
+                members={members.filter((member) => member.unitId === selectedUnitId)}
+                onClose={() => setSelectedUnitId(null)}
+              />
+            );
+          })()}
+      </AnimatePresence>
     </div>
   );
 }

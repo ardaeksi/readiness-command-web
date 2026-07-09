@@ -23,6 +23,7 @@ interface GlobeViewProps {
   units: Unit[];
   members: ServiceMember[];
   activeTransfer: TransferArc | null;
+  onSelectUnit: (unitId: number) => void;
 }
 
 const OCEAN_COLOR = 0x0c2f4f;
@@ -35,10 +36,16 @@ const globeMaterial = new THREE.MeshPhongMaterial({
   shininess: 18,
 });
 
-function createCampMarker(point: CampPoint): HTMLElement {
-  const el = document.createElement("div");
-  el.className = "camp-marker";
-  el.innerHTML = `
+function createCampMarker(point: CampPoint, onSelectUnit: (unitId: number) => void): HTMLElement {
+  // react-globe.gl positions this root element itself via an inline 3D transform (CSS3DObject),
+  // so our own centering/hover transform has to live on an inner wrapper instead - applying it
+  // to the root would fight the library's own transform on every render.
+  const anchor = document.createElement("div");
+  anchor.className = "camp-marker-anchor";
+
+  const inner = document.createElement("div");
+  inner.className = "camp-marker";
+  inner.innerHTML = `
     <svg width="24" height="24" viewBox="0 0 24 24">
       <circle cx="12" cy="12" r="10" fill="rgba(245,166,35,0.18)" />
       <path d="M12 4 L20 18 H4 Z" fill="${ARC_COLOR}" stroke="#3a2205" stroke-width="1" />
@@ -47,10 +54,16 @@ function createCampMarker(point: CampPoint): HTMLElement {
     <span class="camp-marker-label">${point.unit.name}</span>
     <span class="camp-marker-sub">${point.readyCount}/${point.memberCount} ready</span>
   `;
-  return el;
+  inner.addEventListener("click", (event) => {
+    event.stopPropagation();
+    onSelectUnit(point.unit.id);
+  });
+
+  anchor.appendChild(inner);
+  return anchor;
 }
 
-export function GlobeView({ units, members, activeTransfer }: GlobeViewProps) {
+export function GlobeView({ units, members, activeTransfer, onSelectUnit }: GlobeViewProps) {
   const globeRef = useRef<GlobeMethods | undefined>(undefined);
   const [landFeatures, setLandFeatures] = useState<Feature<Geometry>[]>([]);
 
@@ -87,7 +100,7 @@ export function GlobeView({ units, members, activeTransfer }: GlobeViewProps) {
     <Globe
       ref={globeRef}
       globeMaterial={globeMaterial}
-      backgroundColor="#05070a"
+      backgroundImageUrl="/night-sky.png"
       showAtmosphere
       atmosphereColor={ATMOSPHERE_COLOR}
       atmosphereAltitude={0.22}
@@ -100,7 +113,7 @@ export function GlobeView({ units, members, activeTransfer }: GlobeViewProps) {
       htmlElementsData={campPoints}
       htmlLat={(d) => (d as CampPoint).unit.latitude}
       htmlLng={(d) => (d as CampPoint).unit.longitude}
-      htmlElement={(d) => createCampMarker(d as CampPoint)}
+      htmlElement={(d) => createCampMarker(d as CampPoint, onSelectUnit)}
       arcsData={arcs}
       arcStartLat={(d) => (d as TransferArc).startLat}
       arcStartLng={(d) => (d as TransferArc).startLng}
