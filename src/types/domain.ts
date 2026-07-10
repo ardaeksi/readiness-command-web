@@ -4,8 +4,6 @@ export type Rank = "PRIVATE" | "CORPORAL" | "SERGEANT" | "LIEUTENANT" | "CAPTAIN
 
 export type ReadinessStatus = "READY" | "LIMITED" | "NOT_READY" | "ON_LEAVE" | "DEPLOYED";
 
-export type CertificationStatus = "ACTIVE" | "EXPIRED" | "REVOKED";
-
 export type RequestStatus = "PENDING" | "APPROVED" | "DENIED" | "COMPLETED";
 
 export type EquipmentType = "GUN" | "TANK" | "CAR" | "CIVILIAN_CAR" | "TRUCK" | "HELICOPTER";
@@ -30,24 +28,6 @@ export interface ServiceMember {
   readinessStatus: ReadinessStatus;
   unitId: number | null;
   unitName: string | null;
-}
-
-export interface Certification {
-  id: number;
-  name: string;
-  description: string;
-  validityMonths: number;
-}
-
-export interface ServiceMemberCertification {
-  id: number;
-  serviceMemberId: number;
-  serviceMemberName: string;
-  certificationId: number;
-  certificationName: string;
-  earnedDate: string;
-  expiryDate: string;
-  status: CertificationStatus;
 }
 
 export interface Equipment {

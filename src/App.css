@@ -469,3 +469,18 @@
   font-size: 12px;
   color: var(--text);
 }
+
+.territory-tooltip-resources {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px 10px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--panel-border);
+}
+
+.territory-tooltip-resource {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}

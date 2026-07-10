@@ -5,6 +5,7 @@ import { feature } from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
 import type { Feature, Geometry } from "geojson";
 import type { Territory } from "../types/domain";
+import { RESOURCE_LABELS, RESOURCE_ORDER } from "../constants/resources";
 
 interface TerritoryGlobeProps {
   territories: Territory[];
@@ -74,12 +75,17 @@ export function TerritoryGlobe({ territories, onClaimTerritory }: TerritoryGlobe
       polygonSideColor={() => "rgba(200, 210, 220, 0.15)"}
       polygonStrokeColor={() => "#aeb9c4"}
       polygonAltitude={0.006}
+      polygonsTransitionDuration={600}
       polygonLabel={(polygon) => {
         const territory = territoryFor(polygon);
         if (!territory) return "";
+        const resourceLines = RESOURCE_ORDER.map(
+          (type) => `<span class="territory-tooltip-resource">${RESOURCE_LABELS[type]}: ${territory.resources[type] ?? 0}</span>`
+        ).join("");
         return `<div class="territory-tooltip">
           <strong>${territory.countryName}</strong><br/>
           ${territory.ownerDisplayName ? `Owned by ${territory.ownerDisplayName}` : "Unclaimed"}
+          <div class="territory-tooltip-resources">${resourceLines}</div>
         </div>`;
       }}
       onPolygonClick={(polygon) => {

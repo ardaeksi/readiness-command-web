@@ -1,3 +1,5 @@
+export type ResourceType = "WOOD" | "STONE" | "METAL" | "GUNPOWDER" | "OIL" | "FOOD";
+
 export interface Player {
   id: number;
   displayName: string;
@@ -14,4 +16,5 @@ export interface Territory {
   ownerDisplayName: string | null;
   ownerColorHex: string | null;
   population: number;
+  resources: Partial<Record<ResourceType, number>>;
 }
